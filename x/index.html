@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content=" #333">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: #E0E0E0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            background-color: #333;
+            z-index: 1000;
+            padding: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 104%;
+             margin-left: -8px;
+            border-bottom: 8px solid #555;
+        }
+
+        .header .logo {
+            font-size: 36px;
+            color: #E0E0E0;
+            text-align: center;
+        }
+
+        .search-input {
+            padding: 10px;
+            border: 2px solid #555;
+            background-color: #3a3a3a;
+            color: #E0E0E0;
+            border-radius: 40px;
+            outline: none;
+            transition: background-color 0.3s, border-color 0.3s;
+            width: 200px;
+        }
+
+        .search-input:focus {
+            background-color: #555;
+            border-color: #888;
+        }
+
+        .book-cover-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-width: 960px;
+            margin: 30px auto;
+        }
+
+        .book-cover {
+            position: relative;
+            width: 100%;
+            height: 345px;
+            background-color: #4;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .book-cover.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .book-cover.loaded img {
+            opacity: 1;
+        }
+
+        .book-title {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #E0E0E0;
+            font-size: 16px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        @media screen and (max-width: 768px) {
+            .book-cover-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .book-cover-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="header" style="background-color: #333333; border-bottom: none; display: flex; justify-content: space-between; align-items: center; opacity: 0; animation: fadeIn 1s forwards;">
+    <div class="logo">
+        <span style="color: pink; font-weight: bold;">&gt;</span>
+        <span style="color: white; font-size: 75%; font-weight: bold;">w</span>
+        <span style="color: pink; font-weight: bold;">&lt;</span>
+    </div>
+    <input type="text" class="search-input" placeholder="Cari..." id="searchInput" style="margin-left: auto;">
+</div>
+
+<style>
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+</style>
+
+
+<div class="book-cover-container" id="bookCoverContainer"></div>
+
+<script>
+    const books = [
+        { title: "biji", image: "china.gif", link: "x/0/" },
+        { title: "Book 2", image: "cover.jpg", link: "x/1/" },
+        { title: "Book 3", image: "china2.gif", link: "x/1/"},
+        { title: "Book 4", image: "cover.jpg", link: "https://example.com/book4" },
+        { title: "Book 5", image: "renge2.jpg", link: "https://example.com/book5" },
+        { title: "Book 6", image: "cover.jpg", link: "https://example.com/book6" },
+        { title: "Book 7", image: "renge.gif", link: "https://example.com/book7" },
+        { title: "LO 2025-4", image: "x/1/0.png", link: "x/2/" },
+        { title: "Book 9", image: "pler.gif", link: "https://example.com/book9" },
+        { title: "Book 10", image: "cover.jpg", link: "https://example.com/book10" }
+    ];
+
+    let currentIndex = 0;
+    const bookContainer = document.getElementById("bookCoverContainer");
+
+    // Load all books at once
+    function loadBooks() {
+        for (let i = currentIndex; i < books.length; i++) {
+            const book = books[i];
+            const bookCover = document.createElement("div");
+            bookCover.classList.add("book-cover");
+
+            // Wrap the book cover in an anchor tag for redirection
+            const bookLink = document.createElement('a');
+            bookLink.href = book.link;
+            // No need for target="_blank", it will open in the same tab by default
+            // target attribute has been removed
+
+            // Add image and title to the book cover
+            bookCover.innerHTML = `
+                <img data-src="${book.image}" alt="${book.title}">
+                <div class="book-title">${book.title}</div>
+            `;
+            bookLink.appendChild(bookCover);
+            bookContainer.appendChild(bookLink);
+
+            // Lazy load the image
+            const img = bookCover.querySelector('img');
+            img.src = img.dataset.src; // Set src for lazy loading
+            img.onload = () => {
+                bookCover.classList.add('loaded');
+            };
+
+            // Use IntersectionObserver to show book cover when it's in the viewport
+            observer.observe(bookCover);
+        }
+        currentIndex = books.length; // Set currentIndex to length of books array
+    }
+
+    // IntersectionObserver to show book cover when it's in the viewport
+    const observer = new IntersectionObserver((entries, observerInstance) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            } else {
+                entry.target.classList.remove('visible');
+            }
+        });
+    }, { threshold: 0.5 }); // Trigger when 50% of the book cover is visible
+
+    // Initialize loading of books
+    loadBooks();
+
+    // Search Filter Logic
+    document.getElementById("searchInput").addEventListener("input", function() {
+        const searchValue = this.value.toLowerCase();
+        const bookCovers = document.querySelectorAll(".book-cover");
+
+        bookCovers.forEach(function(bookCover) {
+            const title = bookCover.querySelector(".book-title").textContent.toLowerCase();
+            if (title.includes(searchValue)) {
+                bookCover.style.display = "block";
+            } else {
+                bookCover.style.display = "none";
+            }
+        });
+    });
+</script>
+
+
+</body>
+</html>

@@ -43,8 +43,8 @@
         <span style="color: pink; font-weight: bold;">&gt;</span>
         <span style="color: white; font-size: 75%; font-weight: bold;">w</span>
         <span style="color: pink; font-weight: bold;">&lt;</span>
-    </div>
-    <script type="text/javascript">
+      </div>
+      <script type="text/javascript">
         $(document).ready(function() {
             $('body').fadeTo(1000, 1, function() {
                 setTimeout(function() {
@@ -58,14 +58,15 @@
                         'opacity': '0'
                     });
 
-                    $('body').css('background-color', '3a3a3a');
+                    $('body').css('background-color', '#3a3a3a'); // Pastikan warna #3a3a3a konsisten
 
                     setTimeout(function() {
-                        window.location.href = "/x/";
+                        // Mengarahkan ke URL baru
+                        window.location.replace("https://wemiru.moqbit.com/");
                     }, 2000);
                 }, 2000);
             });
         });
-    </script>
+      </script>
   </body>
 </html>
